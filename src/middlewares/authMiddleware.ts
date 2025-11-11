@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/helper/jwt";
 import { errorResponse } from "../utils/helper/response";
+import { AppDataSource } from "../config/connection";
+import { User } from "../entities/user";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -8,14 +10,18 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const publicPaths = ["/login", "/signup"];
-    if (publicPaths.some((path) => req.originalUrl.endsWith(path))) {
+    const publicPaths = [
+      "/api/auth", 
+      "/api/staff/auth", 
+      "/api/user/auth", 
+    ];
+    if (publicPaths.some((path) => req.originalUrl.startsWith(path))) {
       return next();
     }
     const authHeader = req.headers.authorization;
@@ -26,6 +32,13 @@ export const authMiddleware = (
 
     const token = authHeader.split(" ")[1];
     const decoded = verifyToken(token);
+    const userRepo = AppDataSource.getRepository(User);
+    const user = await userRepo.findOneBy({
+      id: req.user.id,
+    });
+    if (user.isActive === false)
+      return errorResponse(res, [], "User has been block", 403);
+
     req.user = decoded;
     next();
   } catch (err: any) {

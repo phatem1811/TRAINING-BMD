@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { errorResponse } from "../utils/helper/response";
+import { errorResponse, serverError } from "../utils/helper/response";
+import { logger } from "../config/logger";
 
 export function errorHandler(
   err: any,
@@ -7,17 +8,16 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-
   let status = err.status || 500;
-  if (status < 400 || status >= 600) {
-    status = 500;
-  }
   let message = err.message || "Internal Server Error";
-  let errors: any[] = err.errors || [];
+  let errors = err.errors || [];
+  logger.error(
+    `${req.method} ${req.originalUrl} | Status: ${status} | Message: ${message} | Stack: ${err.stack}`
+  );
 
   if (status >= 500) {
-    message = "Internal Server Error";
-    errors = [];
+    return serverError(res, errors, message, status);
   }
+
   errorResponse(res, errors, message, status);
 }

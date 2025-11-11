@@ -1,18 +1,36 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/authController";
-import { UserController } from "../controllers/userController";
+import { StaffController } from "../../controllers/staff/staffController";
+import { CreateUserDTO } from "../../dto/user.dto";
+import { validateDTO } from "../../middlewares/validateDTO";
+import { uploadImage } from "../../middlewares/upload";
 const router = Router();
 
-router.post("/initAdmin", AuthController.initAdmin);
-router.post("/login", AuthController.login);
+router.post("/auth/login", StaffController.login);
+router.post(
+  "/createStaff",
+  validateDTO(CreateUserDTO),
+  StaffController.createStaff
+);
+router.post("/auth/initAdmin", StaffController.initAdmin);
+
+router.get("/getProfile", StaffController.getProfile);
+router.get("/getAllStaff", StaffController.getAllStaff);
+router.get("/getById/:id", StaffController.getById);
+
+router.put("/updateProfile/:id", StaffController.updateProfile);
+router.delete("/delete/:id", StaffController.delete);
+
+router.put("/block/:id", StaffController.block);
+
+router.post("/changePassword", StaffController.changePassword)
 
 export default router;
 
 /**
  * @swagger
- * /auth/login:
+ * /Staff/login:
  *   post:
- *     summary: User login
+ *     summary: Staff login
  *     tags:
  *       - Auth
  *     requestBody:
@@ -39,11 +57,11 @@ export default router;
 
 /**
  * @swagger
- * /auth/initAdmin:
+ * /Staff/initAdmin:
  *   post:
  *     summary: initialize admin user
  *     tags:
- *       - Auth
+ *       - Staff
  *     responses:
  *       201:
  *         description: Admin account created successfully

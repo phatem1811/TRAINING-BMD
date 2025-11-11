@@ -27,6 +27,21 @@ export const errorResponse = (
     errors,
   });
 };
+  export const serverError = (
+    res: Response,
+    errors: any = [],
+    message = "Internal Server Error",
+    status = 500
+  ) => {
+    return res.status(status).json({
+      status,
+      success: false,
+      message,
+      errors,
+    });
+  };
+
+// response : 500
 export const notFoundResponse = (
   res: Response,
   message = "Resource not found",

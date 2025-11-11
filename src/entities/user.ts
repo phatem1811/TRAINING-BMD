@@ -6,45 +6,36 @@ import {
   JoinColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
-export enum UserRole {
-    ADMIN = "admin",
-    CLIENT = "client",
-}
+import { Order } from "./order";
+import { BaseEntity } from "./baseEntity";
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-   id: number;
- 
-   @Column({ unique: true })
-   username: string;
- 
-   @Column()
-   password: string;
- 
-   @Column({ nullable: true })
-   fullName: string;
+export class User extends BaseEntity {
 
-   @Column()
-   phone: string;
+  @Column({ unique: true })
+  username: string;
 
-   @Column()
-   email: string;
+  @Column()
+  password: string;
 
-   @Column({ default: true })
-   isActive: boolean;
+  @Column({ nullable: true })
+  avatar: string;
 
-   @Column({
-        type: "enum",
-        enum: UserRole,
-        default: UserRole.CLIENT,
-    })
-    role: UserRole
- 
-   @CreateDateColumn()
-   createdAt: Date;
- 
-   @UpdateDateColumn()
-   updatedAt: Date;
+  @Column({ nullable: true })
+  fullName: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
+
 }

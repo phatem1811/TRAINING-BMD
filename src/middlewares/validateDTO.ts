@@ -17,3 +17,5 @@ export const validateDTO = (DTOClass: any) => {
     next();
   };
 };
+
+
