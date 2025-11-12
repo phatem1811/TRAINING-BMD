@@ -12,10 +12,16 @@ const options: swaggerJSDoc.Options = {
     servers: [
       {
         url: `http://localhost:${envConfig.PORT}${envConfig.BASE_URL}`,
-      }
+      },
     ],
   },
-  apis: ["src/routes/*.ts"],
+
+  apis: [
+    "./src/routes/index.ts",
+    "./src/routes/staff/*.ts",
+    "./src/routes/user/*.ts",
+    "./src/routes/uploadRoute.ts",
+  ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

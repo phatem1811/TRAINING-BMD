@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { StaffController } from "../../controllers/staff/staffController";
-import { CreateUserDTO } from "../../dto/user.dto";
-import { validateDTO } from "../../middlewares/validateDTO";
-import { uploadImage } from "../../middlewares/upload";
+import { validateJoi } from "../../middlewares/validateJoi";
+import { createUser } from "../../validate/userValidation";
 const router = Router();
 
 router.post("/auth/login", StaffController.login);
 router.post(
   "/createStaff",
-  validateDTO(CreateUserDTO),
+  validateJoi(createUser),
   StaffController.createStaff
 );
 router.post("/auth/initAdmin", StaffController.initAdmin);
@@ -28,11 +27,11 @@ export default router;
 
 /**
  * @swagger
- * /Staff/login:
+ * /staff/auth/login:
  *   post:
  *     summary: Staff login
  *     tags:
- *       - Auth
+ *       - Staff
  *     requestBody:
  *       required: true
  *       content:
@@ -57,7 +56,7 @@ export default router;
 
 /**
  * @swagger
- * /Staff/initAdmin:
+ * /staff/auth/initAdmin:
  *   post:
  *     summary: initialize admin user
  *     tags:

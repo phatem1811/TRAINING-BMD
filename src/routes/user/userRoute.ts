@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { UserController } from "../../controllers/user/userController";
-import { CreateUserDTO } from "../../dto/user.dto";
-import { validateDTO } from "../../middlewares/validateDTO";
-import { uploadImage } from "../../middlewares/upload";
+import { validateJoi } from "../../middlewares/validateJoi";
+import { createUser } from "../../validate/userValidation";
 const router = Router();
 
 router.post("/auth/login", UserController.login)
-router.post("/auth/signup",validateDTO(CreateUserDTO), UserController.signUp)
+router.post("/auth/signup",  validateJoi(createUser), UserController.signUp)
 
 router.get("/getProfile", UserController.getProfile);
 router.get("/getAllUsers", UserController.getAllUsers);

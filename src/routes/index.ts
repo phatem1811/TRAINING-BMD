@@ -20,3 +20,13 @@ router.use("/user/product", ProducUserRoute);
 
 router.use("/upload", UploadRoute);
 export default router;
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */

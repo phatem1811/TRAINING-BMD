@@ -18,16 +18,16 @@ export class Staff extends BaseEntity{
    @Column()
    password: string;
 
-   @Column()
+   @Column({ nullable: true })
    avatar: string
  
    @Column({ nullable: true })
    fullName: string;
 
-   @Column()
+   @Column({ nullable: true })
    phone: string;
 
-   @Column()
+   @Column({ nullable: true })
    email: string;
 
    @Column({ default: true })

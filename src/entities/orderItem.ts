@@ -15,18 +15,16 @@ import { Product } from "./product";
 import { BaseEntity } from "./baseEntity";
 
 @Entity()
-export class OrderItem extends BaseEntity{
+export class OrderItem extends BaseEntity {
+  @Column()
+  price: number;
+
+  @Column()
+  quantity: number;
 
   @ManyToOne(() => Order, (order) => order.orderItems)
   order: Order;
 
   @ManyToOne(() => Product)
   product: Product;
-
-  @Column()
-  price: number;
-
-  @Column()
-  quantity: number
-
 }

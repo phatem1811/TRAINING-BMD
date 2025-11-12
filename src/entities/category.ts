@@ -8,7 +8,7 @@ import { Product } from "./product";
 import { BaseEntity } from "./baseEntity";
 @Entity()
 export class Category extends BaseEntity {
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Column({ default: true })

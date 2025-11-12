@@ -23,7 +23,7 @@ export class Product extends BaseEntity {
   @Column()
   description: string;
 
-  @Column({ unique: true })
+  @Column({ default: 0 })
   price: number;
 
   @Column({ default: true })

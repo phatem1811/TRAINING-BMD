@@ -7,7 +7,18 @@ export const ProductController = {
     async (req: Request, res: Response, next: NextFunction) => {
       const filter = req.query;
       const results = await ProductService.getAll(filter);
-      successResponse(res, results, "Get all successfully", 200);
+      successResponse(
+      res,
+      results.data,                   
+      "Get all successfully",
+      200,
+      {
+        total: results.total,
+        page: results.page,
+        limit: results.limit,
+        totalPages: results.totalPages,
+      }
+    );
     }
   ),
   create: asyncHandler(
@@ -19,8 +30,7 @@ export const ProductController = {
   update: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const id = Number(req.params.id);
-      const imageUrl = req.file ? `image/${req.file.filename}` : undefined;
-      const result = await ProductService.update(id, req.body, imageUrl);
+      const result = await ProductService.update(id, req.body);
       successResponse(res, result, "Update successfully", 200);
     }
   ),
@@ -41,8 +51,15 @@ export const ProductController = {
   block: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const id = Number(req.params.id);
-      await ProductService.block(id);
-      successResponse(res, "", "block successfully", 200);
+      const product = await ProductService.block(id);
+      successResponse(res, product, "block successfully", 200);
+    }
+  ),
+  unBlock: asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const id = Number(req.params.id);
+      await ProductService.unBlock(id);
+      successResponse(res, "", "unblock successfully", 200);
     }
   ),
 };

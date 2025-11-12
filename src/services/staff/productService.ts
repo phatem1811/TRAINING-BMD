@@ -24,8 +24,9 @@ export const ProductService = {
     const { limit, page, categoryId, minPrice, maxPrice, name } = filter;
 
     const query = productRepository
-      .createQueryBuilder("product") // select * FROM Product as product
-      .leftJoinAndSelect("product.category", "category"); //LEFT JOIN category AS category ON  product.categoryId = category.id
+      .createQueryBuilder("product")
+      .leftJoinAndSelect("product.category", "category");
+
     if (name) query.andWhere("product.name LIKE :name", { name: `%${name}%` });
     if (categoryId)
       query.andWhere("category.id = :categoryId", { categoryId: categoryId });
@@ -35,20 +36,25 @@ export const ProductService = {
     const pageNumber = Number(page) || 1;
     const limitNumber = Number(limit) || 10;
     const skip = (pageNumber - 1) * limitNumber;
-    query.skip(skip).take(limitNumber);
-    query.orderBy("product.createdAt", "DESC");
+
+    query.skip(skip).take(limitNumber).orderBy("product.createdAt", "DESC");
 
     const [products, total] = await query.getManyAndCount();
+
     return {
-      products,
+      data: products,
       total,
-      page,
-      limit,
+      page: pageNumber,
+      limit: limitNumber,
       totalPages: Math.ceil(total / limitNumber),
     };
   },
   getById: async (id: number) => {
-    const product = await productRepository.findOneBy({ id: id });
+    const product = await productRepository
+      .createQueryBuilder("product")
+      .leftJoinAndSelect("product.category", "category")
+      .where("product.id = :id", { id })
+      .getOne();
     if (!product) throw new BadRequest("product not Found", 400);
     return product;
   },
@@ -67,28 +73,35 @@ export const ProductService = {
     await productRepository.save(product);
     return product;
   },
-  update: async (id: number, reqBody: IProduct, imageUrl: string) => {
+  update: async (id: number, reqBody: IProduct) => {
     const { name, description, price, image } = reqBody;
     const product = await productRepository.findOneBy({ id: id });
     if (!product) throw new BadRequest("product not Found", 400);
     if (name !== undefined) product.name = name;
     if (description !== undefined) product.description = description;
     if (price !== undefined) product.price = price;
-    if (imageUrl !== undefined) product.image = imageUrl;
+    if (image !== undefined) product.image = image;
     const updated = await productRepository.save(product);
     return updated;
   },
   delete: async (id: number) => {
-    const product = await productRepository.findOneBy({ id: id });
+    const product = await productRepository.findOneBy({ id });
     if (!product) throw new BadRequest("category not found", 404);
     await productRepository.remove(product);
     return null;
   },
   block: async (id: number) => {
-    const product = await ProductService.getById(id);
+    const product = await productRepository.findOneBy({ id });
     if (!product) throw new BadRequest("Product not found", 404);
 
     product.isActive = false;
-    return await categoryRepository.save(product);
+    return await productRepository.save(product);
+  },
+  unBlock: async (id: number) => {
+    const product = await productRepository.findOneBy({ id });
+    if (!product) throw new BadRequest("Product not found", 404);
+
+    product.isActive = true;
+    return await productRepository.save(product);
   },
 };

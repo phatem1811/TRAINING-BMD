@@ -33,11 +33,14 @@ export enum PaymentMethod {
 @Entity()
 export class Order extends BaseEntity {
 
-  @ManyToOne(() => User, (user) => user.orders)
-  user: User;
+  @Column()
+  address: string;
 
-  @OneToMany(() => OrderItem, (OrderItem) => OrderItem.order)
-  orderItems: OrderItem[];
+  @Column()
+  note: string
+
+  @Column()
+  totalAmount: number
 
   @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING })
   status: OrderStatus;
@@ -48,13 +51,9 @@ export class Order extends BaseEntity {
   @Column({ type: "enum", enum: PaymentMethod, default: PaymentMethod.COD })
   PaymentMethod: PaymentMethod;
 
-  @Column()
-  address: string;
+  @ManyToOne(() => User, (user) => user.orders)
+  user: User;
 
-  @Column()
-  note: string
-
-  @Column()
-  totalAmount: number
-
+  @OneToMany(() => OrderItem, (OrderItem) => OrderItem.order)
+  orderItems: OrderItem[];
 }
