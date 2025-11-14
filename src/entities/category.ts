@@ -5,9 +5,9 @@ import {
   OneToMany,
 } from "typeorm";
 import { Product } from "./product";
-import { BaseEntity } from "./baseEntity";
+import {  SharedEntity } from "./baseEntity";
 @Entity()
-export class Category extends BaseEntity {
+export class Category extends SharedEntity {
   @Column()
   name: string;
 

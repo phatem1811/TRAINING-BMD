@@ -8,7 +8,14 @@ export const generateToken = (payload: object) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 export const verifyToken = (token: string) => {
-  return jwt.verify(token, JWT_SECRET);
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET!);
+  } catch (err: any) {
+    if (err.name === "TokenExpiredError") {
+      throw new Error("TokenExpired");
+    }
+    throw new Error("InvalidToken");
+  }
 };
 
 export const decodeToken = (token: string) => {

@@ -32,20 +32,29 @@ export const StaffService = {
     return rest;
   },
 
-  getAllStaff: async (limit: number, page: number, search: string) => {
+  getAllStaff: async (
+    limit: number,
+    page: number,
+    search?: string,
+    isActive: boolean = true
+  ) => {
     const skip = (page - 1) * limit;
     const query = staffRepository.createQueryBuilder("staff");
+    query.where("staff.isActive = :isActive", { isActive });
     if (search) {
-      query.where(
-        "staff.fullName LIKE :search OR staff.username LIKE :search OR staff.email LIKE :search OR staff.phone LIKE :search",
+      query.andWhere(
+        "(staff.fullName LIKE :search OR staff.username LIKE :search OR staff.email LIKE :search OR staff.phone LIKE :search)",
         { search: `%${search}%` }
       );
     }
     query.skip(skip).take(limit).orderBy("staff.createdAt", "DESC");
+
     const [staffs, total] = await query.getManyAndCount();
+
     const items = staffs.map(({ password, ...rest }) => rest);
+
     return {
-      items,
+      data:items,
       total,
       page,
       limit,
@@ -101,6 +110,8 @@ export const StaffService = {
       if (!isMatch) {
         throw new BadRequest("User or Password is incorrect", 400);
       }
+      if (staff.isActive === false)
+        throw new BadRequest("Account has been blocked", 400);
       const payload = { id: staff.id, type: "admin" }; // truyen type cho token, them ngay cap token
       const token = generateToken(payload);
       return { token };
@@ -113,6 +124,13 @@ export const StaffService = {
     if (!staff) throw new BadRequest("staff not found", 404);
 
     staff.isActive = false;
+    return await staffRepository.save(staff);
+  },
+  unblock: async (id: number) => {
+    const staff = await staffRepository.findOneBy({ id });
+    if (!staff) throw new BadRequest("staff not found", 404);
+
+    staff.isActive = true;
     return await staffRepository.save(staff);
   },
   changePassword: async (

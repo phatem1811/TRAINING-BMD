@@ -12,11 +12,11 @@ import {
 import { User } from "./user";
 import { Order } from "./order";
 import { Product } from "./product";
-import { BaseEntity } from "./baseEntity";
+import {  SharedEntity } from "./baseEntity";
 
 @Entity()
-export class OrderItem extends BaseEntity {
-  @Column()
+export class OrderItem extends SharedEntity {
+  @Column({default: 0})
   price: number;
 
   @Column()

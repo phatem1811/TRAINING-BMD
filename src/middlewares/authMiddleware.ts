@@ -22,7 +22,7 @@ export const authMiddleware = async (
       return next();
     }
     const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return errorResponse(res, [], "No token provided", 401);
     }
     const token = authHeader.split(" ")[1];
@@ -44,9 +44,18 @@ export const authMiddleware = async (
     if (isUser.isActive === false)
       return errorResponse(res, [], "User has been block", 403);
 
+    if (req.originalUrl.startsWith("/api/staff") && decoded.type !== "admin") {
+      return errorResponse(res, [], "Forbidden: Admin only", 403);
+    }
+     if (req.originalUrl.startsWith("/api/user") && decoded.type !== "client") {
+      return errorResponse(res, [], "Forbidden: User only", 403);
+    }
     req.user = decoded;
     next();
   } catch (err: any) {
+    if (err.message === "TokenExpired") {
+      return errorResponse(res, [], "Token has expired", 410);
+    }
     return errorResponse(res, [], "Unauthorized: Invalid token", 401);
   }
 };

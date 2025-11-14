@@ -7,10 +7,10 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
 } from "typeorm";
-import { BaseEntity } from "./baseEntity";
+import { SharedEntity } from "./baseEntity";
 
 @Entity()
-export class Staff extends BaseEntity{
+export class Staff extends SharedEntity{
  
    @Column({ unique: true })
    username: string;

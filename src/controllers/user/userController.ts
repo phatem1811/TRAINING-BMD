@@ -28,15 +28,29 @@ export const UserController = {
     async (req: Request, res: Response, next: NextFunction) => {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
-      const search = req.query.search as string
-      const users = await UserService.getAllUsers(limit, page,search);
-      successResponse(res, users, "Get all users successfully", 200);
+      const search = req.query.search as string;
+      const isActive: boolean =
+        req.query.isActive !== undefined
+          ? (req.query.isActive as string).toLowerCase() === "true"
+          : true;
+      const results = await UserService.getAllUsers(
+        limit,
+        page,
+        search,
+        isActive
+      );
+      successResponse(res, results.data, "Get all successfully", 200, {
+        total: results.total,
+        page: results.page,
+        limit: results.limit,
+        totalPages: results.totalPages,
+      });
     }
   ),
   signUp: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const users = await UserService.signUp(req.body);
-      successResponse(res, users, "Create successfully", 200);
+      successResponse(res, users, "Created successfully", 200);
     }
   ),
   updateProfile: asyncHandler(
@@ -62,9 +76,15 @@ export const UserController = {
   ),
   changePassword: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const currentUser = req.user.id
-      const {username, password, newPassword, confirmNewPassword} = req.body
-      const users = await UserService.changePassword(username, password, newPassword, confirmNewPassword, currentUser);
+      const currentUser = req.user.id;
+      const { username, password, newPassword, confirmNewPassword } = req.body;
+      const users = await UserService.changePassword(
+        username,
+        password,
+        newPassword,
+        confirmNewPassword,
+        currentUser
+      );
       successResponse(res, users, "Change Password successfully", 200);
     }
   ),

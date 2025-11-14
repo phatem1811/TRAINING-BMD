@@ -35,8 +35,22 @@ export const StaffController = {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
       const search = req.query.search as string;
-      const staffs = await StaffService.getAllStaff(limit, page, search);
-      successResponse(res, staffs, "Get all users successfully", 200);
+      const isActive: boolean =
+        req.query.isActive !== undefined
+          ? (req.query.isActive as string).toLowerCase() === "true"
+          : true;
+      const results = await StaffService.getAllStaff(
+        limit,
+        page,
+        search,
+        isActive
+      );
+      successResponse(res, results.data, "Get all successfully", 200, {
+        total: results.total,
+        page: results.page,
+        limit: results.limit,
+        totalPages: results.totalPages,
+      });
     }
   ),
   createStaff: asyncHandler(
@@ -64,7 +78,14 @@ export const StaffController = {
     async (req: Request, res: Response, next: NextFunction) => {
       const staffId = Number(req.params.id);
       const staff = await StaffService.block(staffId);
-      successResponse(res, "", "Delete successfully", 200);
+      successResponse(res, "", "Block successfully", 200);
+    }
+  ),
+  unblock: asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const staffId = Number(req.params.id);
+      const staff = await StaffService.unblock(staffId);
+      successResponse(res, "", "Unblock successfully", 200);
     }
   ),
   changePassword: asyncHandler(

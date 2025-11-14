@@ -10,7 +10,7 @@ import {
 import { User } from "./user";
 import { OrderItem } from "./orderItem";
 import { extend } from "dayjs";
-import { BaseEntity } from "./baseEntity";
+import { SharedEntity } from "./baseEntity";
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -31,7 +31,7 @@ export enum PaymentMethod {
 }
 
 @Entity()
-export class Order extends BaseEntity {
+export class Order extends SharedEntity {
 
   @Column()
   address: string;

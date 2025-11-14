@@ -5,10 +5,6 @@ import fs from "fs";
 const { combine, timestamp, splat, colorize, printf } = format;
 const logDir = path.join(__dirname, "../logs");
 
-const logFormat = printf((log) => {
-  return `${log.timestamp} [${log.level.toUpperCase()}]: ${log.message}`;
-});
-
 export const logger = createLogger({
   level: "info",
   format: combine(

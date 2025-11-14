@@ -10,6 +10,7 @@ const options: swaggerJSDoc.Options = {
       description: "API documentation",
     },
     servers: [
+      { url: `http://192.168.1.20:${envConfig.PORT}${envConfig.BASE_URL}` },
       {
         url: `http://localhost:${envConfig.PORT}${envConfig.BASE_URL}`,
       },

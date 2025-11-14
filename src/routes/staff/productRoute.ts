@@ -59,7 +59,6 @@ export default router;
  *       500:
  *         description: Internal server error
  */
-
 /**
  * @swagger
  * /staff/product/getAll:
@@ -102,9 +101,15 @@ export default router;
  *         schema:
  *           type: string
  *         description: Filter products by name
+ *       - in: query
+ *         name: isActive
+ *         schema:
+ *           type: boolean
+ *           default: true
+ *         description: Filter products by isActive
  *     responses:
  *       200:
- *         description: List of products with pagination
+ *         description: List products   
  *         content:
  *           application/json:
  *             schema:
@@ -125,6 +130,9 @@ export default router;
  *                         type: string
  *                       description:
  *                         type: string
+ *                       isActive:
+ *                         type: boolean
+ *                         example: true
  *                       category:
  *                         type: object
  *                         properties:

@@ -4,12 +4,23 @@ import { successResponse } from "../../utils/helper/response";
 import { ProductService } from "../../services/user/productService";
 export const ProductController = {
   getAll: asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const filter = req.query;
-      const results = await ProductService.getAll(filter);
-      successResponse(res, results, "Get all successfully", 200);
-    }
-  ),
+      async (req: Request, res: Response, next: NextFunction) => {
+        const filter = req.query;
+        const results = await ProductService.getAll(filter);
+        successResponse(
+        res,
+        results.data,                   
+        "Get all successfully",
+        200,
+        {
+          total: results.total,
+          page: results.page,
+          limit: results.limit,
+          totalPages: results.totalPages,
+        }
+      );
+      }
+    ),
   getById: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const id = Number(req.params.id);

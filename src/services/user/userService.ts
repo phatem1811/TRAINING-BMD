@@ -14,9 +14,15 @@ export const UserService = {
     return rest;
   },
 
-  getAllUsers: async (limit: number, page: number, search: string) => {
+  getAllUsers: async (
+    limit: number,
+    page: number,
+    search: string,
+    isActive: boolean = true
+  ) => {
     const skip = (page - 1) * limit;
     const query = userRepository.createQueryBuilder("user");
+    query.where("user.isActive = :isActive", { isActive });
     if (search) {
       query.where(
         "user.fullName LIKE :search OR user.username LIKE :search OR user.email LIKE :search OR user.phone LIKE :search",
@@ -28,7 +34,7 @@ export const UserService = {
 
     const items = users.map(({ password, ...rest }) => rest);
     return {
-      items,
+      data: items,
       total,
       page,
       limit,
@@ -84,7 +90,9 @@ export const UserService = {
       if (!isMatch) {
         throw new BadRequest("User or Password is incorrect", 400);
       }
-      const payload = { id: user.id , type:"client"};
+      if (user.isActive === false)
+        throw new BadRequest("Account has been blocked", 400);
+      const payload = { id: user.id, type: "client" };
       const token = generateToken(payload);
       return { token };
     } catch (error) {
@@ -92,12 +100,12 @@ export const UserService = {
     }
   },
   block: async (id: number) => {
-      const user = await userRepository.findOneBy({ id });
-      if (!user) throw new BadRequest("staff not found", 404);
-  
-      user.isActive = false;
-      return await userRepository.save(user);
-    },
+    const user = await userRepository.findOneBy({ id });
+    if (!user) throw new BadRequest("staff not found", 404);
+
+    user.isActive = false;
+    return await userRepository.save(user);
+  },
   changePassword: async (
     username: string,
     password: string,

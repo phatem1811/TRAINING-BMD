@@ -1,6 +1,7 @@
 import { Category } from "../../entities/category";
 import { AppDataSource } from "../../config/connection";
 import { BadRequest } from "../../utils/helper/badRequest";
+import { Not } from "typeorm";
 interface ICategory {
   name: string;
 }
@@ -14,7 +15,7 @@ export const CategoryService = {
       order: { createdAt: "DESC" },
     });
     return {
-      categories,
+      data: categories,
       total,
       page,
       limit,
@@ -28,6 +29,10 @@ export const CategoryService = {
   },
   create: async (reqBody: ICategory) => {
     const { name } = reqBody;
+    const existingCategory = await categoryRepository.findOneBy({ name });
+    if (existingCategory) {
+      throw new BadRequest(`Category with name already exists`, 400);
+    }
     const category = categoryRepository.create({
       name,
     });
@@ -38,6 +43,12 @@ export const CategoryService = {
     const { name } = reqBody;
     const category = await categoryRepository.findOneBy({ id: id });
     if (!category) throw new BadRequest("Category not Found", 400);
+    const existingCategory = await categoryRepository.findOne({
+      where: { name, id: Not(id) },
+    });
+    if (existingCategory) {
+      throw new BadRequest(`Category with name already exists`, 400);
+    }
     if (name !== undefined) category.name = name;
     const updated = await categoryRepository.save(category);
     return updated;
@@ -51,10 +62,17 @@ export const CategoryService = {
     return null;
   },
   block: async (id: number) => {
-    const category = await CategoryService.getById(id);
+     const category = await categoryRepository.findOneBy({ id: id });
     if (!category) throw new BadRequest("category not found", 404);
 
     category.isActive = false;
+    return await categoryRepository.save(category);
+  },
+  unblock: async (id: number) => {
+     const category = await categoryRepository.findOneBy({ id: id });
+    if (!category) throw new BadRequest("category not found", 404);
+
+    category.isActive = true;
     return await categoryRepository.save(category);
   },
 };

@@ -10,9 +10,9 @@ import {
   ManyToOne,
 } from "typeorm";
 import { Category } from "./category";
-import { BaseEntity } from "./baseEntity";
+import { SharedEntity } from "./baseEntity";
 @Entity()
-export class Product extends BaseEntity {
+export class Product extends SharedEntity {
 
   @Column({ unique: true })
   name: string;

@@ -5,6 +5,9 @@ import {
   PaymentMethod,
   PaymentStatus,
 } from "../../entities/order";
+import { OrderItem } from "../../entities/orderItem";
+import { Product } from "../../entities/product";
+import { User } from "../../entities/user";
 import { BadRequest } from "../../utils/helper/badRequest";
 interface IFilterOrder {
   paymentStatus?: PaymentStatus;
@@ -15,8 +18,66 @@ interface IFilterOrder {
   page?: number;
   limit?: number;
 }
+export interface ICreateOrderInput {
+  userId: number;
+  address: string;
+  note?: string;
+  paymentMethod: "cod" | "bank_transfer";
+  items: IOrderItemInput[];
+}
+export interface IOrderItemInput {
+  productId: number;
+  price: number;
+  quantity: number;
+}
+const orderItemRepository = AppDataSource.getRepository(OrderItem);
 const OrderRepository = AppDataSource.getRepository(Order);
+const userRepository = AppDataSource.getRepository(User);
+const productRepository = AppDataSource.getRepository(Product);
 export const OrderService = {
+  create: async (data: ICreateOrderInput) => {
+    const { userId, address, note, paymentMethod, items } = data;
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user) throw new BadRequest("User not found", 404);
+    let totalAmount = 0;
+    const orderItemsToSave: OrderItem[] = [];
+    for (const item of items) {
+      const product = await productRepository.findOneBy({ id: item.productId });
+      if (!product) throw new BadRequest(`Product not found`, 404);
+      const orderItem = OrderItem.create({
+        product,
+        quantity: item.quantity,
+        price: product.price,
+      });
+      totalAmount += product.price * item.quantity;
+
+      orderItemsToSave.push(orderItem);
+    }
+    const order = OrderRepository.create({
+      user,
+      address,
+      note: note || "",
+      PaymentMethod: paymentMethod as PaymentMethod,
+      totalAmount,
+      status: OrderStatus.PENDING,
+      paymentStatus:
+        paymentMethod === "bank_transfer"
+          ? PaymentStatus.PAID
+          : PaymentStatus.UNPAID,
+    });
+
+    await OrderRepository.save(order);
+    for (const oi of orderItemsToSave) {
+      oi.order = order;
+      await orderItemRepository.save(oi);
+    }
+    const fullOrder = await OrderRepository.findOne({
+      where: { id: order.id },
+      relations: ["orderItems", "orderItems.product", "user"],
+    });
+
+    return fullOrder;
+  },
   getAll: async (filter: IFilterOrder) => {
     const {
       paymentStatus,
@@ -27,7 +88,7 @@ export const OrderService = {
       limit,
       search,
     } = filter;
-    const query = OrderRepository.createQueryBuilder("order").leftJoin(
+    const query = OrderRepository.createQueryBuilder("order").leftJoinAndSelect(
       "order.user",
       "user"
     );
@@ -35,7 +96,7 @@ export const OrderService = {
       query.andWhere("order.paymentStatus = :paymentStatus", { paymentStatus });
     if (paymentMethod)
       query.andWhere("order.PaymentMethod = :paymentMethod", { paymentMethod });
-    if (paymentStatus) query.andWhere("order.status = :status", { status });
+    if (status) query.andWhere("order.status = :status", { status });
     if (userId) query.andWhere("user.id = :userId", { userId });
     if (search) {
       query.andWhere(
@@ -48,8 +109,15 @@ export const OrderService = {
     const skip = (pageNumber - 1) * limitNumber;
     query.skip(skip).take(limitNumber).orderBy("order.createdAt", "DESC");
     const [orders, total] = await query.getManyAndCount();
+    orders.forEach((order) => {
+      if (order.user) {
+        delete order.user.password,
+        delete order.user.createdAt,
+        delete order.user.updatedAt;
+      }
+    });
     return {
-      orders,
+      data: orders,
       total,
       page,
       limit,
@@ -57,13 +125,12 @@ export const OrderService = {
     };
   },
   getById: async (id: number) => {
-    const order = await OrderRepository.createQueryBuilder("order")
-      .leftJoin("order.user", "user")
-      .leftJoin("order.orderItems", "orderItems")
-      .leftJoin("orderItems.product", "product")
-      .where("order.id = :id", { id })
-      .getOne();
-    if (!order) throw new BadRequest("Order not found", 404);
+    const fullOrder = await OrderRepository.findOne({
+      where: { id },
+      relations: ["orderItems", "orderItems.product", "user"],
+    });
+    if (!fullOrder) throw new BadRequest("Order not found", 404);
+    return fullOrder;
   },
   confirmOrder: async (id: number) => {
     const order = await OrderRepository.findOneBy({ id });
@@ -83,6 +150,7 @@ export const OrderService = {
     const order = await OrderRepository.findOneBy({ id });
     if (!order) throw new BadRequest("Order not found", 404);
     order.status = OrderStatus.COMPLETED;
+    order.paymentStatus = PaymentStatus.PAID;
     await OrderRepository.save(order);
     return null;
   },

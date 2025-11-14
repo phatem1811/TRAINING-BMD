@@ -1,7 +1,8 @@
 import express from "express";
 import router from "./routes/index";
-import 'dotenv/config';
+import "dotenv/config";
 import "reflect-metadata";
+import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 import { logger } from "./config/logger";
@@ -11,10 +12,15 @@ import { notFoundResponse } from "./utils/helper/response";
 import { authMiddleware } from "./middlewares/authMiddleware";
 const app = express();
 const port = process.env.PORT || 3000;
-const host = process.env.HOST || 'localhost';
+const host = process.env.HOST || "localhost";
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 AppDataSource.initialize()
   .then(() => {
@@ -35,5 +41,5 @@ app.use(authMiddleware);
 app.use("/api", router);
 app.use(errorHandler);
 app.use((req, res, next) => {
-    next(notFoundResponse(res))
-})
+  next(notFoundResponse(res));
+});

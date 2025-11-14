@@ -1,6 +1,7 @@
-import { PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate } from "typeorm";
+import { PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, BaseEntity } from "typeorm";
 
-export abstract class BaseEntity {
+
+export abstract class SharedEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

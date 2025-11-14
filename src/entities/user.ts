@@ -9,10 +9,10 @@ import {
   OneToMany,
 } from "typeorm";
 import { Order } from "./order";
-import { BaseEntity } from "./baseEntity";
+import { SharedEntity } from "./baseEntity";
 
 @Entity()
-export class User extends BaseEntity {
+export class User extends SharedEntity {
 
   @Column({ unique: true })
   username: string;

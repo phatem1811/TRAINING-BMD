@@ -2,6 +2,7 @@ import { AppDataSource } from "../../config/connection";
 import { BadRequest } from "../../utils/helper/badRequest";
 import { Product } from "../../entities/product";
 import { Category } from "../../entities/category";
+import { Not } from "typeorm";
 interface IProduct {
   name: string;
   image: string;
@@ -16,12 +17,14 @@ interface IProductFilter {
   maxPrice?: number;
   page?: number;
   limit?: number;
+  isActive?: string;
 }
 const productRepository = AppDataSource.getRepository(Product);
 const categoryRepository = AppDataSource.getRepository(Category);
 export const ProductService = {
   getAll: async (filter: IProductFilter) => {
-    const { limit, page, categoryId, minPrice, maxPrice, name } = filter;
+    const { limit, page, categoryId, minPrice, maxPrice, name, isActive } =
+      filter;
 
     const query = productRepository
       .createQueryBuilder("product")
@@ -32,6 +35,12 @@ export const ProductService = {
       query.andWhere("category.id = :categoryId", { categoryId: categoryId });
     if (minPrice) query.andWhere("product.price >= :minPrice", { minPrice });
     if (maxPrice) query.andWhere("product.price <= :maxPrice", { maxPrice });
+    let activeStatus: number = 1;
+    if (isActive !== undefined) {
+      if (isActive === "true") activeStatus = 1;
+      else if (isActive === "false") activeStatus = 0;
+    }
+    query.andWhere("product.isActive = :activeStatus", { activeStatus });
 
     const pageNumber = Number(page) || 1;
     const limitNumber = Number(limit) || 10;
@@ -40,7 +49,6 @@ export const ProductService = {
     query.skip(skip).take(limitNumber).orderBy("product.createdAt", "DESC");
 
     const [products, total] = await query.getManyAndCount();
-
     return {
       data: products,
       total,
@@ -62,7 +70,10 @@ export const ProductService = {
     const { name, image, description, price, categoryId } = reqBody;
     const category = await categoryRepository.findOneBy({ id: categoryId });
     if (!category) throw new BadRequest("Category not found", 400);
-
+    const existingProduct = await productRepository.findOneBy({ name });
+    if (existingProduct) {
+      throw new BadRequest(`Product with name already exists`, 400);
+    }
     const product = productRepository.create({
       name,
       image: image,
@@ -77,6 +88,12 @@ export const ProductService = {
     const { name, description, price, image } = reqBody;
     const product = await productRepository.findOneBy({ id: id });
     if (!product) throw new BadRequest("product not Found", 400);
+    const existingProduct = await productRepository.findOne({
+      where: { name, id: Not(id) },
+    });
+    if (existingProduct) {
+      throw new BadRequest(`Product with name already exists`, 400);
+    }
     if (name !== undefined) product.name = name;
     if (description !== undefined) product.description = description;
     if (price !== undefined) product.price = price;

@@ -7,7 +7,18 @@ export const OrderController = {
   getAll: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
       const filter = req.query;
-      const result = await OrderService.getAll(filter);
+      const results = await OrderService.getAll(filter);
+      successResponse(res, results.data, "Get all successfully", 200, {
+        total: results.total,
+        page: results.page,
+        limit: results.limit,
+        totalPages: results.totalPages,
+      });
+    }
+  ),
+  create: asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const result = await OrderService.create(req.body);
       successResponse(res, result, "Orders fetched successfully", 200);
     }
   ),

@@ -31,7 +31,8 @@ export const ProductService = {
       query.andWhere("category.id = :categoryId", { categoryId: categoryId });
     if (minPrice) query.andWhere("product.price >= :minPrice", { minPrice });
     if (maxPrice) query.andWhere("product.price <= :maxPrice", { maxPrice });
-
+    let activeStatus: number = 1; 
+    query.andWhere("product.isActive = :activeStatus", { activeStatus });
     const pageNumber = Number(page) || 1;
     const limitNumber = Number(limit) || 10;
     const skip = (pageNumber - 1) * limitNumber;
@@ -40,10 +41,10 @@ export const ProductService = {
 
     const [products, total] = await query.getManyAndCount();
     return {
-      products,
+      data: products,
       total,
-      page,
-      limit,
+      page: pageNumber,
+      limit: limitNumber,
       totalPages: Math.ceil(total / limitNumber),
     };
   },

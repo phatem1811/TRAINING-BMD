@@ -8,7 +8,12 @@ export const CategoryController = {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
       const results = await CategoryService.getAll(limit, page);
-      successResponse(res, results, "Get all successfully", 200);
+      successResponse(res, results.data, "Get all successfully", 200, {
+        total: results.total,
+        page: results.page,
+        limit: results.limit,
+        totalPages: results.totalPages,
+      });
     }
   ),
   create: asyncHandler(
@@ -43,6 +48,13 @@ export const CategoryController = {
       const id = Number(req.params.id);
       await CategoryService.block(id);
       successResponse(res, "", "block successfully", 200);
+    }
+  ),
+  unblock: asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const id = Number(req.params.id);
+      await CategoryService.unblock(id);
+      successResponse(res, "", "Unblock successfully", 200);
     }
   ),
 };
