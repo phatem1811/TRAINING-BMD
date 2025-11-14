@@ -5,23 +5,23 @@ import { createOrder } from "../../validate/orderValidation";
 const router = Router();
 // staff
 
-router.get("/getAll", OrderController.getAll);
-router.get("/getById/:id", OrderController.getById);
-router.post("/create", validateJoi(createOrder), OrderController.create);
+router.get("", OrderController.getAll);
+router.get("/:id", OrderController.getById);
+router.post("", validateJoi(createOrder), OrderController.create);
 
-router.put("/confirm/:id", OrderController.confirmOrder);
-router.put("/shipping/:id", OrderController.shippingOrder);
-router.put("/complete/:id", OrderController.completeOrder);
-router.put("/cancel/:id", OrderController.cancelOrder);
+router.put("/:id/confirm", OrderController.confirmOrder);
+router.put("/:id/shipping", OrderController.shippingOrder);
+router.put("/:id/complete", OrderController.completeOrder);
+router.put("/:id/cancel", OrderController.cancelOrder);
 
-router.put("/paid/:id", OrderController.confirmPaid);
-router.put("/refund/:id", OrderController.refundOrder);
+router.put("/:id/paid", OrderController.confirmPaid);
+router.put("/:id/refund", OrderController.refundOrder);
 
 
 export default router;
 /**
  * @swagger
- * /staff/order/getAll:
+ * /staff/order:
  *   get:
  *     summary: Get list of orders (with filters and pagination)
  *     tags:
@@ -138,7 +138,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/create:
+ * /staff/order:
  *   post:
  *     summary: Create a new order
  *     tags:
@@ -193,7 +193,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/order/getById/{id}:
+ * /staff/order/{id}:
  *   get:
  *     summary: Get order details by ID
  *     tags:
@@ -306,7 +306,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/confirm/{id}:
+ * /staff/order/{id}/confirm:
  *   put:
  *     summary: Confirm an order
  *     tags:
@@ -333,7 +333,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/shipping/{id}:
+ * /staff/order/{id}/shipping:
  *   put:
  *     summary: Mark an order as shipping
  *     tags:
@@ -360,7 +360,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/complete/{id}:
+ * /staff/order/{id}/complete:
  *   put:
  *     summary: Complete an order
  *     tags:
@@ -387,7 +387,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/cancel/{id}:
+ * /staff/order/{id}/cancel:
  *   put:
  *     summary: Cancel an order
  *     tags:
@@ -414,7 +414,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/paid/{id}:
+ * /staff/order/{id}/paid:
  *   put:
  *     summary: Mark an order as paid
  *     tags:
@@ -441,7 +441,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/order/refund/{id}:
+ * /staff/order/{id}/refund:
  *   put:
  *     summary: Refund an order
  *     tags:

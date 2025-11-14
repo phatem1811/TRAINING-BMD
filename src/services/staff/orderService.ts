@@ -112,8 +112,8 @@ export const OrderService = {
     orders.forEach((order) => {
       if (order.user) {
         delete order.user.password,
-        delete order.user.createdAt,
-        delete order.user.updatedAt;
+          delete order.user.createdAt,
+          delete order.user.updatedAt;
       }
     });
     return {
@@ -135,6 +135,12 @@ export const OrderService = {
   confirmOrder: async (id: number) => {
     const order = await OrderRepository.findOneBy({ id });
     if (!order) throw new BadRequest("Order not found", 404);
+    if (order.status !== OrderStatus.PENDING) {
+      throw new BadRequest(
+        `Cannot confirm order. Current status is '${order.status}'`,
+        400
+      );
+    }
     order.status = OrderStatus.CONFIRMED;
     await OrderRepository.save(order);
     return null;
@@ -142,6 +148,12 @@ export const OrderService = {
   shippingOrder: async (id: number) => {
     const order = await OrderRepository.findOneBy({ id });
     if (!order) throw new BadRequest("Order not found", 404);
+    if (order.status !== OrderStatus.CONFIRMED) {
+      throw new BadRequest(
+        `Cannot confirm order. Current status is '${order.status}'`,
+        400
+      );
+    }
     order.status = OrderStatus.SHIPPING;
     await OrderRepository.save(order);
     return null;
@@ -149,6 +161,12 @@ export const OrderService = {
   completeOrder: async (id: number) => {
     const order = await OrderRepository.findOneBy({ id });
     if (!order) throw new BadRequest("Order not found", 404);
+    if (order.status !== OrderStatus.SHIPPING) {
+      throw new BadRequest(
+        `Cannot confirm order. Current status is '${order.status}'`,
+        400
+      );
+    }
     order.status = OrderStatus.COMPLETED;
     order.paymentStatus = PaymentStatus.PAID;
     await OrderRepository.save(order);
@@ -157,6 +175,9 @@ export const OrderService = {
   cancelOrder: async (id: number) => {
     const order = await OrderRepository.findOneBy({ id });
     if (!order) throw new BadRequest("Order not found", 404);
+    if (order.status === OrderStatus.COMPLETED) {
+      throw new BadRequest(`This order COMPLETED`, 400);
+    }
     order.status = OrderStatus.CANCELLED;
     await OrderRepository.save(order);
     return null;

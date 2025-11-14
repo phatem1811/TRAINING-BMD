@@ -4,20 +4,20 @@ import { createCategory, updateCategory } from "../../validate/categoryValidatio
 import { validateJoi } from "../../middlewares/validateJoi";
 const router = Router();
 // staff
-router.post("/create", validateJoi(createCategory), CategoryController.create);
-router.get("/getAll", CategoryController.getAll);
-router.get("/getById/:id", CategoryController.getById);
-router.put("/update/:id", validateJoi(updateCategory), CategoryController.update);
-router.delete("/delete/:id", CategoryController.delete);
-router.put("/block/:id", CategoryController.block);
-router.put("/unblock/:id", CategoryController.unblock);
+router.post("/", validateJoi(createCategory), CategoryController.create);
+router.get("/", CategoryController.getAll);
+router.get("/:id", CategoryController.getById);
+router.put("/:id", validateJoi(updateCategory), CategoryController.update);
+router.delete("/:id", CategoryController.delete);
+router.put("/:id/block", CategoryController.block);
+router.put("/:id/unblock", CategoryController.unblock);
 
 
 export default router;
 
 /**
  * @swagger
- * /staff/category/create:
+ * /staff/category:
  *   post:
  *     summary: Create a new category
  *     tags:
@@ -67,7 +67,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/category/getAll:
+ * /staff/category:
  *   get:
  *     summary: Get all categories
  *     tags:
@@ -132,7 +132,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/category/getById/{id}:
+ * /staff/category/{id}:
  *   get:
  *     summary: Get a category by ID
  *     tags:
@@ -179,7 +179,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/category/update/{id}:
+ * /staff/category/{id}:
  *   put:
  *     summary: Update a category by ID
  *     tags:
@@ -252,7 +252,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/category/block/{id}:
+ * /staff/category/{id}/block:
  *   put:
  *     summary: Khóa category 
  *     tags:
@@ -305,7 +305,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/category/unblock/{id}:
+ * /staff/category/{id}/unblock:
  *   put:
  *     summary: Mở khóa category 
  *     tags:

@@ -5,6 +5,7 @@ import { CategoryService } from "../../services/staff/categoryService";
 export const CategoryController = {
   getAll: asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+      console.log("callllllllllllllllllllllllll")
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
       const results = await CategoryService.getAll(limit, page);

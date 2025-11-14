@@ -6,16 +6,18 @@ import { createOrder } from "../../validate/orderValidation";
 const router = Router();
 // staff
 
-router.post("/create", validateJoi(createOrder), OrderController.create);
-router.get("/getById/:id", OrderController.getById);
-router.get("/getSummary", OrderController.getSummary);
+router.post("/", validateJoi(createOrder), OrderController.create);
 router.get("/getOrderHistory", OrderController.getOrderHistory);
+router.get("/getSummary", OrderController.getSummary);
+
+router.get("/:id", OrderController.getById);
+
 
 export default router;
 
 /**
  * @swagger
- * /user/order/create:
+ * /user/order:
  *   post:
  *     summary: Create a new order
  *     tags:
@@ -68,7 +70,7 @@ export default router;
 
 /**
  * @swagger
- * /user/order/getById/{id}:
+ * /user/order/{id}:
  *   get:
  *     summary: Get order details by ID
  *     tags:

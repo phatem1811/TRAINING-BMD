@@ -6,24 +6,26 @@ const router = Router();
 
 router.post("/auth/login", StaffController.login);
 router.post(
-  "/createStaff",
+  "/",
   validateJoi(createUser),
   StaffController.createStaff
 );
 router.post("/auth/initAdmin", StaffController.initAdmin);
 router.post("/create", validateJoi(createUser), StaffController.createStaff);
 
+router.get("/", StaffController.getAllStaff);
 router.get("/getProfile", StaffController.getProfile);
-router.get("/getAll", StaffController.getAllStaff);
-router.get("/getById/:id", StaffController.getById);
-
-router.put("/updateProfile/:id", StaffController.updateProfile);
-router.delete("/delete/:id", StaffController.delete);
-
-router.put("/block/:id", StaffController.block);
-router.put("/unblock/:id", StaffController.unblock);
+router.get("/:id", StaffController.getById);
 
 router.put("/changePassword", StaffController.changePassword)
+router.put("/:id", StaffController.updateProfile);
+router.put("/:id/block", StaffController.block);
+router.put("/:id/unblock", StaffController.unblock);
+
+router.delete("/delete/:id", StaffController.delete);
+
+
+
 
 export default router;
 
@@ -73,7 +75,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/create:
+ * /staff:
  *   post:
  *     summary: Tạo mới nhân viên
  *     description: API tạo mới một nhân viên
@@ -137,107 +139,9 @@ export default router;
 
 /**
  * @swagger
- * /staff/getAll:
+ * /staff:
  *   get:
  *     summary: Lấy danh sách tất cả nhân viên
- *     tags:
- *       - Staff
- *     security:
- *       - BearerAuth: []  
- *     parameters:
- *       - name: page
- *         in: query
- *         required: false
- *         schema:
- *           type: integer
- *           default: 1
- *         description: Trang hiện tại 
- *       - name: limit
- *         in: query
- *         required: false
- *         schema:
- *           type: integer
- *           default: 10
- *         description: Số lượng nhân viên mỗi trang
- *       - name: search
- *         in: query
- *         required: false
- *         schema:
- *           type: string
- *         description: Từ khóa tìm kiếm theo fullName, username, email hoặc phone
- *         example: "nguyen"
- *       - name: isActive
- *         in: query
- *         required: false
- *         schema:
- *           type: boolean
- *           default: true
- *         description: 
- *           Lọc theo trạng thái hoạt động. 
- *           Nếu không truyền, mặc định là `true`
- *     responses:
- *       200:
- *         description: Lấy danh sách nhân viên thành công
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       username:
- *                         type: string
- *                         example: admin
- *                       fullName:
- *                         type: string
- *                         example: Nguyễn Văn A
- *                       email:
- *                         type: string
- *                         example: nguyenvana@example.com
- *                       phone:
- *                         type: string
- *                         example: "0909123456"
- *                       avatar:
- *                         type: string
- *                         example: https://example.com/avatar.jpg
- *                       isActive:
- *                         type: boolean
- *                         example: true
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                         example: 2025-11-13T08:15:00.000Z
- *                 total:
- *                   type: integer
- *                   example: 45
- *                 page:
- *                   type: integer
- *                   example: 1
- *                 limit:
- *                   type: integer
- *                   example: 10
- *                 totalPages:
- *                   type: integer
- *                   example: 5
- *       400:
- *         description: Query param không hợp lệ
- *       401:
- *         description: Không có hoặc token không hợp lệ
- *       500:
- *         description: Lỗi máy chủ nội bộ
- */
-
-/**
- * @swagger
- * /user/getAll:
- *   get:
- *     summary: Lấy danh sách tất cả khách hàng
  *     tags:
  *       - Staff
  *     security:
@@ -387,7 +291,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/getById/{id}:
+ * /staff/{id}:
  *   get:
  *     summary: Lấy thông tin hồ sơ của nhân viên
  *     tags:
@@ -449,7 +353,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/updateProfile/{id}:
+ * /staff/{id}:
  *   put:
  *     summary: Cập nhật thông tin hồ sơ của nhân viên
  *     tags:
@@ -530,7 +434,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/block/{id}:
+ * /staff/{id}/block:
  *   put:
  *     summary: Khóa (vô hiệu hóa) tài khoản nhân viên
  *     tags:
@@ -591,13 +495,13 @@ export default router;
  */
 /**
  * @swagger
- * /staff/unblock/{id}:
+ * /staff/{id}/unblock:
  *   put:
  *     summary: Mở khóa tài khoản nhân viên
  *     tags:
  *       - Staff
  *     security:
- *       - bearerAuth: []  
+ *       - BearerAuth: []  
  *     parameters:
  *       - name: id
  *         in: path

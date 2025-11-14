@@ -4,21 +4,21 @@ import { validateJoi } from "../../middlewares/validateJoi";
 import { createProduct, updateProduct } from "../../validate/productValidation";
 const router = Router();
 
-router.post("/create", validateJoi(createProduct), ProductController.create);
-router.get("/getAll", ProductController.getAll);
-router.get("/getById/:id", ProductController.getById);
+router.post("/", validateJoi(createProduct), ProductController.create);
+router.get("", ProductController.getAll);
+router.get("/:id", ProductController.getById);
 
-router.put("/update/:id", validateJoi(updateProduct), ProductController.update);
+router.put("/:id", validateJoi(updateProduct), ProductController.update);
 
-router.delete("/delete/:id", ProductController.delete);
-router.put("/block/:id", ProductController.block);
-router.put("/unBlock/:id", ProductController.unBlock);
+router.delete("/:id", ProductController.delete);
+router.put("/:id/block", ProductController.block);
+router.put("/:id/unBlock", ProductController.unBlock);
 
 export default router;
 
 /**
  * @swagger
- * /staff/product/create:
+ * /staff/product:
  *   post:
  *     summary: Create a new product
  *     tags:
@@ -61,7 +61,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/product/getAll:
+ * /staff/product:
  *   get:
  *     summary: Get all products
  *     tags:
@@ -158,7 +158,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/product/getById/{id}:
+ * /staff/product/{id}:
  *   get:
  *     summary: Get a product by ID
  *     tags:
@@ -221,7 +221,7 @@ export default router;
 
 /**
  * @swagger
- * /staff/product/update/{id}:
+ * /staff/product/{id}:
  *   put:
  *     summary: Update a product by ID
  *     tags:
@@ -304,7 +304,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/product/block/{id}:
+ * /staff/product/{id}/block:
  *   put:
  *     summary: Block  a product by ID
  *     tags:
@@ -343,7 +343,7 @@ export default router;
  */
 /**
  * @swagger
- * /staff/product/unblock/{id}:
+ * /staff/product/{id}/unblock:
  *   put:
  *     summary: unBlock a product by ID
  *     tags:

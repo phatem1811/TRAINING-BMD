@@ -1,30 +1,11 @@
-import swaggerJSDoc from "swagger-jsdoc";
-import { envConfig } from "./envConfig";
+import express from "express";
+import adminSwaggerSpec from "./swaggerAdmin";
+import clientSwaggerSpec from "./swaggerCilent";
 
-const options: swaggerJSDoc.Options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Example API",
-      version: "1.0.0",
-      description: "API documentation",
-    },
-    servers: [
-      { url: `http://192.168.1.20:${envConfig.PORT}${envConfig.BASE_URL}` },
-      {
-        url: `http://localhost:${envConfig.PORT}${envConfig.BASE_URL}`,
-      },
-    ],
-  },
+const router = express.Router();
 
-  apis: [
-    "./src/routes/index.ts",
-    "./src/routes/staff/*.ts",
-    "./src/routes/user/*.ts",
-    "./src/routes/uploadRoute.ts",
-  ],
-};
+// Xuất file JSON cho Swagger UI
+router.get("/docs/admin.json", (req, res) => res.json(adminSwaggerSpec));
+router.get("/docs/client.json", (req, res) => res.json(clientSwaggerSpec));
 
-const swaggerSpec = swaggerJSDoc(options);
-
-export default swaggerSpec;
+export default router;

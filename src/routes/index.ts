@@ -13,16 +13,17 @@ import OrderUserRoute from "./user/orderRoute";
 import UploadRoute from "./uploadRoute";
 const router = Router();
 
-router.use("/staff", StaffRoute);
+
 router.use("/staff/product", ProductStaffRoute);
 router.use("/staff/category", CategoryStaffRoute);
 router.use("/staff/order", OrderStaffRoute);
 router.use("/staff/dashboard", DashboardRoute);
+router.use("/staff", StaffRoute);
 
-router.use("/user", UserRoute);
 router.use("/user/category", CategoryUserRoute);
 router.use("/user/product", ProducUserRoute);
 router.use("/user/order", OrderUserRoute);
+router.use("/user", UserRoute);
 
 router.use("/upload", UploadRoute);
 export default router;
